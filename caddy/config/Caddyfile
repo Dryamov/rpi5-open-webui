@@ -88,3 +88,11 @@
 	# Caddy автоматически поддерживает WebSocket, необходимый для чата
 	reverse_proxy openwebui:8080
 }
+
+# Прокси для CLI Proxy API Plus
+{$CLIPROXY_HOSTNAME} {
+	import webui_security
+	encode zstd gzip
+	
+	reverse_proxy cli-proxy-api-plus:8317
+}

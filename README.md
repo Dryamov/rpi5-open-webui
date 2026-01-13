@@ -27,6 +27,7 @@ Create a `.env` file in the root directory based on this template:
 # Domain names
 SEARXNG_BASE_URL=search.example.com
 OPENWEBUI_HOSTNAME=ai.example.com
+CLIPROXY_HOSTNAME=proxy.example.com
 
 # Email for Let's Encrypt
 LETSENCRYPT_EMAIL=your-email@example.com

@@ -29,12 +29,13 @@ services:
     environment:
       - SEARXNG_BASE_URL="${SEARXNG_BASE_URL:-search.localhost}"
       - OPENWEBUI_HOSTNAME="${OPENWEBUI_HOSTNAME:-ai.localhost}"
+      - CLIPROXY_HOSTNAME="${CLIPROXY_HOSTNAME:-proxy.localhost}"
       - LETSENCRYPT_EMAIL="${LETSENCRYPT_EMAIL:-internal}"
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./caddy/conf:/etc/caddy
+      - ./caddy/config:/etc/caddy
       - caddy_data:/data
       - caddy_config:/config
     networks:
@@ -123,7 +124,7 @@ services:
     expose:
       - "8080"
     volumes:
-      - ./searxng/conf:/etc/searxng:rw
+      - ./searxng/config:/etc/searxng:rw
       - searxng_data:/var/cache/searxng:rw
     environment:
       - LANG=C.UTF-8
@@ -154,6 +155,38 @@ services:
       timeout: 10s
       retries: 3
       start_period: 15s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+  cli-proxy-api-plus:
+    image: ${CLI_PROXY_IMAGE:-eceasy/cli-proxy-api-plus:latest}
+    container_name: cli-proxy-api-plus
+    restart: unless-stopped
+    networks:
+      - backend-net
+    expose:
+      - "8317"
+    ports:
+      - "54545:54545"
+      - "51121:51121"
+    environment:
+      - DEPLOY=${DEPLOY:-}
+    volumes:
+      - ./cli-proxy-api-plus/config/config.yaml:/CLIProxyAPI/config.yaml
+      - ./cli-proxy-api-plus/auths:/root/.cli-proxy-api
+      - ./cli-proxy-api-plus/logs:/CLIProxyAPI/logs
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "1"
+    healthcheck:
+      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8317/ || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
     deploy:
       resources:
         limits:
