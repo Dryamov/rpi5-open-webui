@@ -1,0 +1,148 @@
+# see https://docs.searxng.org/admin/settings/settings.html#settings-use-default-settings
+use_default_settings: true
+
+general:
+  # Debug mode, only for development. Is overwritten by ${SEARXNG_DEBUG}
+  debug: false
+  # displayed name
+  instance_name: "SearXNG!"
+  # For example: https://example.com/privacy
+  privacypolicy_url: false
+  # use true to use your own donation page written in searx/info/en/donate.md
+  # use false to disable the donation link
+  donation_url: false
+  # mailto:contact@example.com
+  contact_url: false
+  # record stats
+  enable_metrics: true
+  # expose stats in open metrics format at /metrics
+  # leave empty to disable (no password set)
+  # open_metrics: <password>
+  open_metrics: ''
+server:
+  secret_key: "3a1b349202ac06b4f51cdad418471d7f7c94b8e4801cd7059e65b2b13a086217"  # change this!
+  limiter: true  # enable this when running the instance for a public usage on the internet
+  image_proxy: true
+valkey:
+  url: redis://valkey:6379/0
+
+brand:
+  new_issue_url: ""
+  docs_url: ""
+  public_instances: ""
+  wiki_url: ""
+  issue_url: ""
+
+search:
+  formats:
+    - html
+    - json
+
+engines:
+  - name: torch
+    engine: xpath
+    inactive: true
+    disabled: true
+
+  - name: ahmia
+    engine: ahmia
+    inactive: true
+    disabled: true
+
+# see https://docs.searxng.org/admin/settings/settings.html#settings-use-default-settings
+use_default_settings: true
+
+general:
+  # Debug mode, only for development. Is overwritten by ${SEARXNG_DEBUG}
+  debug: false
+  # displayed name
+  instance_name: "SearXNG!"
+  # For example: https://example.com/privacy
+  privacypolicy_url: false
+  # use true to use your own donation page written in searx/info/en/donate.md
+  # use false to disable the donation link
+  donation_url: false
+  # mailto:contact@example.com
+  contact_url: false
+  # record stats
+  enable_metrics: true
+  # expose stats in open metrics format at /metrics
+  # leave empty to disable (no password set)
+  # open_metrics: <password>
+  open_metrics: ''
+server:
+  secret_key: "3a1b349202ac06b4f51cdad418471d7f7c94b8e4801cd7059e65b2b13a086217"  # change this!
+  limiter: false  # enable this when running the instance for a public usage on the internet
+  image_proxy: true
+valkey:
+  url: redis://valkey:6379/0
+
+brand:
+  new_issue_url: ""
+  docs_url: ""
+  public_instances: ""
+  wiki_url: ""
+  issue_url: ""
+
+search:
+  formats:
+    - html
+    - json
+
+engines:
+  - name: torch
+    engine: xpath
+    inactive: true
+    disabled: true
+
+  - name: ahmia
+    engine: ahmia
+    inactive: true
+    disabled: true
+
+ui:
+  default_locale: "ru"
+  query_in_title: false
+  center_alignment: false
+  cache_url: https://web.archive.org/web/
+  default_theme: simple
+  theme_args:
+    simple_style: auto
+  search_on_category_select: true
+  hotkeys: default
+  url_formatting: pretty
+
+plugins:
+
+  searx.plugins.calculator.SXNGPlugin:
+    active: false
+
+  searx.plugins.infinite_scroll.SXNGPlugin:
+    active: true
+
+  searx.plugins.hash_plugin.SXNGPlugin:
+    active: true
+
+  searx.plugins.self_info.SXNGPlugin:
+    active: true
+
+  searx.plugins.unit_converter.SXNGPlugin:
+    active: true
+
+  searx.plugins.ahmia_filter.SXNGPlugin:
+    active: false
+
+  searx.plugins.hostnames.SXNGPlugin:
+    active: true
+
+  searx.plugins.time_zone.SXNGPlugin:
+    active: true
+
+  searx.plugins.oa_doi_rewrite.SXNGPlugin:
+    active: false
+
+  searx.plugins.tor_check.SXNGPlugin:
+    active: false
+
+  searx.plugins.tracker_url_remover.SXNGPlugin:
+    active: true
