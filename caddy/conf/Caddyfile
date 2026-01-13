@@ -1,27 +1,90 @@
 {
-    # Указываем почту для уведомлений от Let's Encrypt (желательно)
-    # email your-email@example.com
+	# Отключаем админ-панель для безопасности
+	admin 0.0.0.0:2019
+    email {$LETSENCRYPT_EMAIL}
+	# Настройка приватных логов (маскировка IP)
+	log {
+		output stderr
+		format filter {
+			# Скрываем часть IP адреса (маскировка для соответствия GDPR/приватности)
+			request>remote_ip ip_mask 8 32
+			request>client_ip ip_mask 8 32
+
+			# Удаляем метаданные и параметры поисковых запросов из логов
+			request>remote_port delete
+			request>headers delete
+			request>uri query {
+				delete url
+				delete h
+				delete q
+			}
+		}
+	}
+
+	servers {
+		# Доверяем заголовкам прокси (нужно для корректного определения IP внутри сети)
+		client_ip_headers X-Forwarded-For X-Real-IP
+		trusted_proxies static private_ranges
+		trusted_proxies_strict
+	}
 }
 
-# Если вы тестируете локально, оставьте localhost.
-# Если сервер в сети — замените на реальный домен.
-localhost {
-    # Реверс-прокси на Open WebUI
-    reverse_proxy openwebui:8080 {
-        # Настройка таймаутов для долгих ответов от нейросетей
-        header_up Host {host}
-        header_up X-Real-IP {remote_host}
-    }
+# --- ШАБЛОНЫ БЕЗОПАСНОСТИ ---
 
-    # Настройки безопасности заголовков
-    header {
-        X-Frame-Options "SAMEORIGIN"
-        X-Content-Type-Options "nosniff"
-        Strict-Transport-Security "max-age=31536000;"
-    }
+# 1. Максимально строгий (для SearXNG)
+(strict_security) {
+	header {
+		Content-Security-Policy "upgrade-insecure-requests; default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; form-action 'self' https:; font-src 'self'; frame-ancestors 'self'; base-uri 'self'; connect-src 'self'; img-src * data:; frame-src https:;"
+		Permissions-Policy "accelerometer=(),camera=(),geolocation=(),gyroscope=(),magnetometer=(),microphone=(),payment=(),usb=()"
+		Referrer-Policy "same-origin"
+		X-Content-Type-Options "nosniff"
+		X-Robots-Tag "noindex, nofollow"
+		# HSTS (включает принудительный HTTPS на год)
+		Strict-Transport-Security "max-age=31536000;"
+		-Server
+	}
+}
 
-    # Логирование (путь /data внутри контейнера примонтирован к вашей папке)
-    log {
-        output file /data/access.log
-    }
+# 2. Адаптированный для нейросети (для Open WebUI)
+(webui_security) {
+	header {
+		# Разрешаем микрофон (self) для голосового ввода и более свободные картинки (blob:)
+		Content-Security-Policy "upgrade-insecure-requests; default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src * data: blob:; font-src 'self' data:; frame-ancestors 'self'; connect-src 'self' https: wss:; frame-src https:;"
+		Permissions-Policy "camera=(), microphone=(self), geolocation=()"
+		Referrer-Policy "same-origin"
+		X-Content-Type-Options "nosniff"
+		X-Robots-Tag "noindex, nofollow"
+		Strict-Transport-Security "max-age=31536000;"
+		-Server
+	}
+}
+
+# --- ДОМЕНЫ ---
+
+# Поисковик SearXNG
+{$SEARXNG_BASE_URL} {
+	import strict_security
+	encode zstd gzip
+
+	# Специфичные правила кэширования для SearXNG
+	@static path /static/*
+	@imageproxy path /image_proxy
+	
+	route {
+		header Cache-Control "no-cache"
+		header @static Cache-Control "public, max-age=30, stale-while-revalidate=60"
+		header @imageproxy Cache-Control "public, max-age=3600"
+		# Пересылка на контейнер searxng
+		reverse_proxy searxng:8080
+	}
+}
+
+# Интерфейс нейросети Open WebUI
+{$OPENWEBUI_HOSTNAME} {
+	import webui_security
+	encode zstd gzip
+
+	# Open WebUI работает на порту 8080 внутри контейнера
+	# Caddy автоматически поддерживает WebSocket, необходимый для чата
+	reverse_proxy openwebui:8080
 }

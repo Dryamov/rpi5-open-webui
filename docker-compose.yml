@@ -10,7 +10,7 @@ services:
     networks:
       - backend-net
     healthcheck:
-      test: ["CMD-SHELL", "ollama list || exit 1"]
+      test: [ "CMD-SHELL", "ollama list || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -20,6 +20,10 @@ services:
     image: ${CADDY_IMAGE:-caddy:2.10}
     container_name: caddy
     restart: unless-stopped
+    environment:
+      - SEARXNG_BASE_URL="${SEARXNG_BASE_URL:-search.localhost}"
+      - OPENWEBUI_HOSTNAME="${OPENWEBUI_HOSTNAME:-ai.localhost}"
+      - LETSENCRYPT_EMAIL="${LETSENCRYPT_EMAIL:-internal}"
     ports:
       - "80:80"
       - "443:443"
@@ -32,16 +36,19 @@ services:
     depends_on:
       openwebui:
         condition: service_healthy
+      searxng:
+        condition: service_healthy
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "wget --no-verbose --tries=1 --spider http://localhost:2019/metrics || exit 1",
-        ]
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://caddy:2019/metrics || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 3
       start_period: 5s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "1"
 
   openwebui:
     image: ${OPENWEBUI_IMAGE:-ghcr.io/open-webui/open-webui:main}
@@ -51,7 +58,7 @@ services:
       - "8080"
     environment:
       - OLLAMA_BASE_URL=http://ollama:11434
-      - WEBUI_SECRET_KEY=${WEBUI_SECRET_KEY:-your-secret-key}
+      - WEBUI_SECRET_KEY=${WEBUI_SECRET_KEY:-$(openssl rand -hex 32)}}
     volumes:
       - ./openwebui/data:/app/backend/data
     networks:
@@ -60,19 +67,88 @@ services:
       ollama:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
       interval: 15s
       timeout: 5s
       retries: 3
       start_period: 30s
+
+
+  valkey:
+    container_name: valkey
+    image: docker.io/valkey/valkey:9.0.1-alpine3.23
+    command: valkey-server --save 30 1 --loglevel warning
+    restart: unless-stopped
+    networks:
+      - backend-net
+    volumes:
+      - valkey_data:/data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "1"
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  searxng:
+    container_name: searxng
+    image: docker.io/searxng/searxng:latest
+    restart: unless-stopped
+    networks:
+      - backend-net
+    expose:
+      - "8080"
+    volumes:
+      - ./searxng/conf:/etc/searxng:rw
+      - searxng_data:/var/cache/searxng:rw
+    environment:
+      - LANG=C.UTF-8
+      - LC_ALL=C.UTF-8
+      - SEARXNG_PUBLIC_INSTANCE=${SEARXNG_PUBLIC_INSTANCE:-false}
+      - SEARXNG_LIMITER=${SEARXNG_LIMITER:-false}
+      - SEARXNG_BASE_URL=https://search.${SEARXNG_BASE_URL:-search.localhost}/
+      - SEARXNG_IMAGE_PROXY=${SEARXNG_IMAGE_PROXY:-false}
+      - SEARXNG_SECRET=${SEARXNG_SECRET:-$(openssl rand -hex 32)}
+      - SEARXNG_VALKEY_URL=${SEARXNG_VALKEY_URL:-valkey://valkey:6379/0}
+      - SEARXNG_DEBUG=${SEARXNG_DEBUG:-false}
+      - SEARXNG_PORT=${SEARXNG_PORT:-8080}
+      - SEARXNG_BIND_ADDRESS=${SEARXNG_BIND_ADDRESS:-0.0.0.0}
+      - SEARXNG_METHOD=${SEARXNG_METHOD:-POST}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "1"
+    depends_on:
+      valkey:
+        condition: service_healthy
+    healthcheck:
+      test: 
+        - "CMD-SHELL"
+        - "python3 -c 'import urllib.request; urllib.request.urlopen(\"http://0.0.0.0:8080/healthz\")'"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
 networks:
   backend-net:
-    driver: bridge
 
 volumes:
   ollama_data:
     name: ollama_data
   caddy_data:
-    name: candy_data
+    name: caddy_data
   caddy_config:
-    name: candy_conf
+    name: caddy_config
+  searxng_config:
+    name: searxng_config
+  searxng_data:
+    name: searxng_data
+  valkey_data:
+    name: valkey_data
