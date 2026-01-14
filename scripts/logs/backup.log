@@ -1,0 +1,64 @@
+[2026-01-15 00:40:35] [INFO] --- Запуск бэкапа: 20260115_004035 ---
+[2026-01-15 00:40:35] [INFO] Остановка контейнеров для обеспечения целостности данных...
+[2026-01-15 00:40:42] [INFO] Архивация файлов проекта (через Docker-контейнер)...
+[2026-01-15 00:42:33] [INFO] Бэкап Docker volumes (6 шт.)...
+[2026-01-15 00:42:33] [INFO] -> Обработка тома: caddy_data
+[2026-01-15 00:42:33] [INFO] -> Обработка тома: caddy_config
+[2026-01-15 00:42:34] [INFO] -> Обработка тома: searxng_data
+[2026-01-15 00:42:35] [INFO] -> Обработка тома: valkey_data
+[2026-01-15 00:42:35] [INFO] -> Обработка тома: cli-proxy_auths
+[2026-01-15 00:42:36] [INFO] -> Обработка тома: ollama_data
+[2026-01-15 00:42:36] [WARN]    Исключаем из ollama_data: models
+[2026-01-15 00:42:36] [INFO] Создание финального архива...
+[2026-01-15 00:43:37] [INFO] Очистка старых бэкапов (храним 7 дн.)...
+[2026-01-15 00:43:37] [INFO] Бэкап успешно создан: ./backups/rpi5-openwebui_backup_20260115_004035.tar.gz
+[2026-01-15 00:43:37] [INFO] Завершение скрипта. Проверка состояния сервисов...
+time="2026-01-15T00:43:38+03:00" level=warning msg="The \"SEARXNG_SECRET\" variable is not set. Defaulting to a blank string."
+time="2026-01-15T00:43:38+03:00" level=warning msg="The \"WEBUI_SECRET_KEY\" variable is not set. Defaulting to a blank string."
+time="2026-01-15T00:43:38+03:00" level=warning msg="No services to build"
+ Network rpi5-openwebui_backend-net Creating 
+ Network rpi5-openwebui_backend-net Created 
+time="2026-01-15T00:43:38+03:00" level=warning msg="volume \"cli-proxy_auths\" already exists but was not created by Docker Compose. Use `external: true` to use an existing volume"
+time="2026-01-15T00:43:38+03:00" level=warning msg="volume \"ollama_data\" already exists but was created for project \"rpi5-open-webui\" (expected \"rpi5-openwebui\"). Use `external: true` to use an existing volume"
+ Container valkey Creating 
+ Container ollama Creating 
+ Container valkey Created 
+ Container searxng Creating 
+ Container ollama Created 
+ Container searxng Created 
+ Container cli-proxy-api-plus Creating 
+ Container cli-proxy-api-plus Created 
+ Container openwebui Creating 
+ Container openwebui Created 
+ Container caddy Creating 
+ Container caddy Created 
+ Container ollama Starting 
+ Container valkey Starting 
+ Container ollama Started 
+ Container valkey Started 
+ Container valkey Waiting 
+ Container valkey Healthy 
+ Container searxng Starting 
+ Container searxng Started 
+ Container ollama Waiting 
+ Container searxng Waiting 
+ Container ollama Healthy 
+ Container searxng Healthy 
+ Container cli-proxy-api-plus Starting 
+ Container cli-proxy-api-plus Started 
+ Container searxng Waiting 
+ Container ollama Waiting 
+ Container cli-proxy-api-plus Waiting 
+ Container ollama Healthy 
+ Container searxng Healthy 
+ Container cli-proxy-api-plus Healthy 
+ Container openwebui Starting 
+ Container openwebui Started 
+ Container searxng Waiting 
+ Container cli-proxy-api-plus Waiting 
+ Container openwebui Waiting 
+ Container cli-proxy-api-plus Healthy 
+ Container searxng Healthy 
+ Container openwebui Healthy 
+ Container caddy Starting 
+ Container caddy Started 

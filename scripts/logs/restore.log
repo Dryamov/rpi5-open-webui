@@ -1,0 +1,98 @@
+[2026-01-15 00:47:08] [WARN] ВНИМАНИЕ: Текущие данные будут перезаписаны!
+[2026-01-15 00:47:12] [INFO] --- Запуск восстановления (/home/dryamov/Repositories/rpi5-openwebui/./backups/rpi5-openwebui_backup_20260115_004035.tar.gz) ---
+[2026-01-15 00:47:12] [INFO] Распаковка основного архива...
+[2026-01-15 00:47:21] [INFO] Остановка текущих контейнеров...
+time="2026-01-15T00:47:22+03:00" level=warning msg="The \"WEBUI_SECRET_KEY\" variable is not set. Defaulting to a blank string."
+time="2026-01-15T00:47:22+03:00" level=warning msg="The \"SEARXNG_SECRET\" variable is not set. Defaulting to a blank string."
+ Container caddy Stopping 
+ Container caddy Stopped 
+ Container caddy Removing 
+ Container caddy Removed 
+ Container openwebui Stopping 
+ Container openwebui Stopped 
+ Container openwebui Removing 
+ Container openwebui Removed 
+ Container cli-proxy-api-plus Stopping 
+ Container cli-proxy-api-plus Stopped 
+ Container cli-proxy-api-plus Removing 
+ Container cli-proxy-api-plus Removed 
+ Container ollama Stopping 
+ Container searxng Stopping 
+ Container ollama Stopped 
+ Container ollama Removing 
+ Container ollama Removed 
+ Container searxng Stopped 
+ Container searxng Removing 
+ Container searxng Removed 
+ Container valkey Stopping 
+ Container valkey Stopped 
+ Container valkey Removing 
+ Container valkey Removed 
+ Network rpi5-openwebui_backend-net Removing 
+ Network rpi5-openwebui_backend-net Removed 
+[2026-01-15 00:47:28] [INFO] Восстановление файлов проекта...
+[2026-01-15 00:47:57] [INFO] Восстановление Docker volumes (Project: rpi5-openwebui)...
+[2026-01-15 00:47:57] [INFO] -> Восстановление тома: caddy_config
+caddy_config
+[2026-01-15 00:47:58] [INFO] -> Восстановление тома: caddy_data
+caddy_data
+[2026-01-15 00:47:59] [INFO] -> Восстановление тома: cli-proxy_auths
+cli-proxy_auths
+[2026-01-15 00:47:59] [INFO] -> Восстановление тома: ollama_data
+ollama_data
+[2026-01-15 00:48:00] [INFO] -> Восстановление тома: searxng_data
+searxng_data
+[2026-01-15 00:48:01] [INFO] -> Восстановление тома: valkey_data
+valkey_data
+[2026-01-15 00:48:01] [INFO] Очистка временных файлов...
+[2026-01-15 00:48:01] [INFO] Запуск сервисов...
+time="2026-01-15T00:48:02+03:00" level=warning msg="The \"WEBUI_SECRET_KEY\" variable is not set. Defaulting to a blank string."
+time="2026-01-15T00:48:02+03:00" level=warning msg="The \"SEARXNG_SECRET\" variable is not set. Defaulting to a blank string."
+time="2026-01-15T00:48:02+03:00" level=warning msg="No services to build"
+ Network rpi5-openwebui_backend-net Creating 
+ Network rpi5-openwebui_backend-net Created 
+time="2026-01-15T00:48:02+03:00" level=warning msg="volume \"cli-proxy_auths\" already exists but was not created by Docker Compose. Use `external: true` to use an existing volume"
+time="2026-01-15T00:48:02+03:00" level=warning msg="volume \"ollama_data\" already exists but was created for project \"rpi5-open-webui\" (expected \"rpi5-openwebui\"). Use `external: true` to use an existing volume"
+ Container valkey Creating 
+ Container ollama Creating 
+ Container ollama Created 
+ Container valkey Created 
+ Container searxng Creating 
+ Container searxng Created 
+ Container cli-proxy-api-plus Creating 
+ Container cli-proxy-api-plus Created 
+ Container openwebui Creating 
+ Container openwebui Created 
+ Container caddy Creating 
+ Container caddy Created 
+ Container valkey Starting 
+ Container ollama Starting 
+ Container valkey Started 
+ Container valkey Waiting 
+ Container ollama Started 
+ Container valkey Healthy 
+ Container searxng Starting 
+ Container searxng Started 
+ Container ollama Waiting 
+ Container searxng Waiting 
+ Container ollama Healthy 
+ Container searxng Healthy 
+ Container cli-proxy-api-plus Starting 
+ Container cli-proxy-api-plus Started 
+ Container searxng Waiting 
+ Container ollama Waiting 
+ Container cli-proxy-api-plus Waiting 
+ Container searxng Healthy 
+ Container ollama Healthy 
+ Container cli-proxy-api-plus Healthy 
+ Container openwebui Starting 
+ Container openwebui Started 
+ Container openwebui Waiting 
+ Container searxng Waiting 
+ Container cli-proxy-api-plus Waiting 
+ Container cli-proxy-api-plus Healthy 
+ Container searxng Healthy 
+ Container openwebui Healthy 
+ Container caddy Starting 
+ Container caddy Started 
+[2026-01-15 00:49:06] [INFO] --- Восстановление завершено успешно! ---

@@ -10,6 +10,10 @@
 SET_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(cd "$SET_DIR/.." && pwd)"
 CONFIG_FILE="$SET_DIR/backup.config"
+LOG_DIR="$SET_DIR/logs"
+LOG_FILE="$LOG_DIR/backup.log"
+
+mkdir -p "$LOG_DIR"
 
 # Цвета
 GREEN='\033[0;32m'
@@ -18,18 +22,31 @@ RED='\033[0;31m'
 NC='\033[0m'
 
 # --- Функции ---
-log_info()    { echo -e "${GREEN}[INFO]${NC} $1"; }
-log_warn()    { echo -e "${YELLOW}[WARN]${NC} $1"; }
-log_error()   { echo -e "${RED}[ERROR]${NC} $1"; }
+log_message() {
+    local level=$1
+    local msg=$2
+    local color=$3
+    local timestamp=$(date "+%Y-%m-%d %H:%M:%S")
+    
+    # В консоль
+    echo -e "${color}[${level}]${NC} ${msg}"
+    
+    # В файл (без цветов)
+    echo "[${timestamp}] [${level}] ${msg}" >> "$LOG_FILE"
+}
+
+log_info()    { log_message "INFO" "$1" "$GREEN"; }
+log_warn()    { log_message "WARN" "$1" "$YELLOW"; }
+log_error()   { log_message "ERROR" "$1" "$RED"; }
 
 # Защитный механизм: перезапуск контейнеров при любом исходе
 cleanup() {
     local status=$?
     log_info "Завершение скрипта. Проверка состояния сервисов..."
-    cd "$PROJECT_ROOT" && docker compose up -d --remove-orphans
+    cd "$PROJECT_ROOT" && docker compose up -d --remove-orphans >> "$LOG_FILE" 2>&1
     rm -rf "$TEMP_DIR"
     if [ $status -ne 0 ]; then
-        log_error "Бэкап завершился с ошибкой!"
+        log_error "Бэкап завершился с ошибкой! Проверьте логи: $LOG_FILE"
     fi
 }
 trap cleanup EXIT INT TERM

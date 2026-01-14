@@ -1,4 +1,4 @@
-# name: rpi5-openwebui (Disabled for compatibility with older docker-compose)
+name: rpi5-openwebui
 
 services:
   ollama:
@@ -209,14 +209,14 @@ networks:
 
 volumes:
   ollama_data:
-    external: true
+    name: ollama_data
   caddy_data:
-    external: true
+    name: caddy_data
   caddy_config:
-    external: true
+    name: caddy_config
   searxng_data:
-    external: true
+    name: searxng_data
   valkey_data:
-    external: true
+    name: valkey_data
   cli-proxy_auths:
-    external: true
+    name: cli-proxy_auths

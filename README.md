@@ -87,6 +87,26 @@ Open WebUI is primarily configured via environment variables. For a full list of
 ```
 - **Внимание**: Текущие данные будут перезаписаны! Скрипт восстановит и файлы проекта, и содержимое Docker томов.
 
+## Расширение системы (Добавление новых сервисов)
+Если вы добавили новый контейнер в `docker-compose.yml`, выполните следующие шаги:
+
+### 1. Добавление Docker тома
+Если у сервиса есть именованный том (volume):
+1. Укажите имя тома в массиве `BACKUP_VOLUMES` внутри файла `scripts/backup.config`.
+2. В `docker-compose.yml` рекомендуется не использовать `external: true` при первом создании, чтобы Docker сам создал том. Скрипт восстановления сам добавит нужные метки проекта при восстановлении.
+
+### 2. Добавление локальных папок (Bind Mounts)
+Если сервис использует локальную папку:
+1. Убедитесь, что путь к папке указан в массиве `BACKUP_FILES` в `scripts/backup.config`.
+2. Рекомендуется использовать пути относительно корня проекта.
+
+### 3. Исключение данных
+Если в новом томе/папке есть тяжелые данные (кэш, временные файлы), которые не нужно бэкапить:
+1. Добавьте запись в `VOLUME_EXCLUDES` в формате `"volume_name:relative_path"`.
+
+### 4. Логирование
+Все новые операции будут автоматически записываться в `scripts/logs/backup.log`. В случае ошибок проверьте этот файл.
+
 ## Optimization for RPi5
 - **Resource Limits**: Configured in `docker-compose.yml` to prevent system crashes.
 - **Valkey**: Used by SearXNG for ultra-fast result caching.
